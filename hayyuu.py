@@ -1,9 +1,12 @@
 import telebot
 import re
 import pickle
+from dotenv import load_dotenv
+import os
 
-# Bot API token
-API_TOKEN = "7745731112:AAH5-WuM8wptW-VbsDkf4WU9eBaMq5eR5L0"
+load_dotenv()  # Load environment variables from .env file
+
+API_TOKEN = os.getenv('API_TOKEN')
 bot = telebot.TeleBot(API_TOKEN)
 
 # Load the CRF model
@@ -18,7 +21,7 @@ def amharic_tokenizer(text):
     return tokens
 
 
-# Define feature extraction functions
+# features 
 def word_features(sent, i):
     word = sent[i]
 
@@ -67,7 +70,6 @@ Send /help for Help Page
  Follow @Bright_codes for more information. 🚀""")
 
 
-# Handle /about command
 @bot.message_handler(commands=['about'])
 def send_about(message):
     if not is_user_in_channel(message.from_user.id):
@@ -104,7 +106,6 @@ def send_about(message):
         bot.reply_to(message, about_text, parse_mode="Markdown", disable_web_page_preview=True)
 
 
-# Handle /help command
 @bot.message_handler(commands=['help'])
 def send_help(message):
     if not is_user_in_channel(message.from_user.id):
@@ -126,7 +127,6 @@ def send_help(message):
     else:
         bot.reply_to(message, help_text, parse_mode="html")
 
-# Handle /teach command
 @bot.message_handler(commands=['teach'])
 def send_teach(message):
     if not is_user_in_channel(message.from_user.id):
@@ -168,7 +168,6 @@ def handle_info(message):
     Stay tuned for more as we embark on a journey to bring powerful AI to your fingertips.
     """, parse_mode="html")
 
-# Universal handler for all user messages
 @bot.message_handler(func=lambda message: True)
 def handle_all_messages(message):
     # Check if the user is a member of @Bright_Codes channel
@@ -205,11 +204,11 @@ def run_bot():
     while True:
         try:
             print("Bot is running...")
-            bot.infinity_polling()  # Start the bot polling loop
+            bot.infinity_polling()  
         except Exception as e:
             print(f"Error occurred: {e}")
             print("Reconnecting in 10 seconds...")
-            time.sleep(10)  # Wait for 10 seconds before retrying
+            time.sleep(10)  
 
 # Run the bot with automatic retries
 run_bot()
