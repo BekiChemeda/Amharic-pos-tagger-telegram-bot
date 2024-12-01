@@ -20,8 +20,8 @@ Hayyuu is a Telegram bot designed to perform Part-of-Speech (POS) tagging for Am
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/your-username/Hayyuu-POS-Bot.git
-   cd Hayyuu-POS-Bot
+   git clone https://github.com/BekiChemeda/Amharic-pos-tagger-telegram-bot.git
+   cd Amharic-pos-tagger-telegram-bot
    ```
 
 2. **Install dependencies**:
