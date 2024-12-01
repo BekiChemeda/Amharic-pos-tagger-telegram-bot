@@ -31,7 +31,7 @@ Hayyuu is a Telegram bot designed to perform Part-of-Speech (POS) tagging for Am
 
 3. **Set up your channel**:
    - Update the channel username in the code:
-     - Open `bot.py` and replace `@Bright_Codes` with your own Telegram channel username.
+     - Open `hayyuu.py` and replace `@Bright_Codes` with your own Telegram channel username.
    - Make the bot an **administrator** in your channel:
      - Go to your Telegram channel settings and add your bot as an admin. Ensure it has the necessary permissions to check user membership.
 
@@ -42,7 +42,7 @@ API_TOKEN=Your_Bot_API_YOU_GOT_FROM_BotFather
 ```
 5. **Run the bot**:
    ```bash
-   python bot.py
+   python hayyuu.py
    ```
 
 
@@ -64,7 +64,7 @@ Ensure you have Python 3.8 or higher installed. Install the dependencies from `r
 
 ## Model Information
 
-The bot uses a CRF model trained on Amharic data. The model file `tuned_crf_pos_tagger.pkl` is included in the repository and pre-loaded by the bot. If you want to retrain or update the model, see the training script provided.
+The bot uses a CRF model trained on Amharic data. The model file `tuned_crf_pos_tagger.pkl` is included in the repository and pre-loaded by the bot. If you want to retrain or update the model, I will send you the script.
 
 
 ## Contributing
