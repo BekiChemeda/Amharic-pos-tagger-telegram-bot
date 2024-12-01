@@ -36,8 +36,10 @@ Hayyuu is a Telegram bot designed to perform Part-of-Speech (POS) tagging for Am
      - Go to your Telegram channel settings and add your bot as an admin. Ensure it has the necessary permissions to check user membership.
 
 4. **Set your API token**:
-   - Replace the placeholder `API_TOKEN` in `bot.py` with your Telegram bot API token.
-
+   - create .env file and add your API token you got from bot father bot to it.
+  ```bash
+API_TOKEN=Your_Bot_API_YOU_GOT_FROM_BotFather
+```
 5. **Run the bot**:
    ```bash
    python bot.py
