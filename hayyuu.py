@@ -3,13 +3,14 @@ import re
 import pickle
 from dotenv import load_dotenv
 import os
+import time
 
-load_dotenv()  # Load environment variables from .env file
+load_dotenv()
 
 API_TOKEN = os.getenv('API_TOKEN')
 bot = telebot.TeleBot(API_TOKEN)
 
-# Load the CRF model
+# Load CRF model
 with open("tuned_crf_pos_tagger.pkl", "rb") as model_file:
     crf_model = pickle.load(model_file)
 
@@ -21,7 +22,6 @@ def amharic_tokenizer(text):
     return tokens
 
 
-# features 
 def word_features(sent, i):
     word = sent[i]
 
@@ -41,174 +41,110 @@ def sent2features(sent):
     return [word_features(sent, i) for i in range(len(sent))]
 
 
-
-
-# Check if user has joined the channel
-def is_user_in_channel(user_id):
-    try:
-        member_status = bot.get_chat_member("@Bright_Codes", user_id)
-        return member_status.status in ["member", "administrator", "creator"]
-    except:
-        return False
-
-
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    if not is_user_in_channel(message.from_user.id):
-        bot.reply_to(message, "Please join @Bright_Codes to use this bot. when you're done send /start again.")
-        return
     bot.reply_to(message,
                  """Welcome to Hayyuu Amharic POS Tagger Bot! 🎉
 
- This bot tags parts of speech for Amharic & other Ethiopian languages using a Conditional Random Fields (CRF) model.
+This bot tags parts of speech for Amharic & other Ethiopian languages using a Conditional Random Fields (CRF) model.
 
- 📜 To get started, send an Amharic sentence, and I will tag the words with their parts of speech.
+📜 To get started, send an Amharic sentence.
 
-Send /help for Help Page
-
- Stay tuned for future updates!
- Follow @Bright_codes for more information. 🚀""")
+Send /help for Help Page.
+""")
 
 
 @bot.message_handler(commands=['about'])
 def send_about(message):
-    if not is_user_in_channel(message.from_user.id):
-        bot.reply_to(message, "Please join @Bright_Codes to use this bot.")
-        return
     about_text = (
         "🤖 **Bot Name**: Hayyuu Amharic POS Tagger Bot (v1.0)\n\n"
 
-        "Hayyuu is an Afaan Oromoo word, meaning **ምሁር** in Amharic and translating to 'scholar' or 'wise one' in English. "
-        "So why did  [my developer](https://t.me/bek_i), call me Hayyuu? Well, because I’m designed to help you understand the parts of speech "
-        "in Amharic words! Now, full transparency—I’m still learning, so I’m not perfect just yet. Right now, I can only help with words we use in daily life. "
-        "I’m not 100% accurate, but the good news is, I’m continuously learning. 😊\n\n"
+        "Hayyuu is an Afaan Oromoo word meaning ምሁር. "
+        "I tag parts of speech using a CRF model.\n\n"
 
-        "Do you want to help me improve? [ My developer](https://t.me/bek_i), is planning to introduce a special /teach command. "
-        "Selected users will be able to guide my learning with new data. Although it’s ‘coming soon’ for now, I’m excited to get even better at helping you!\n\n"
-
-        "📊 **Amharic Data Information**:\n\n"
-        "[My Developer](https://t.me/BEK_I) fed me a lot of data to make sure I’m well-trained in Amharic! Here’s a quick summary:\n"
-        "\n- **Training Set**: 67.9k unique words\n"
-        "- **Validation Set**: 9,436 unique words\n"
-        "- **Test Set**: 9,496 unique words\n\n"
-
-        "Altogether, that’s a total of **86,832 unique words**! Isn’t that impressive? Try it out for yourself by sending some Amharic text!\n\n"
-
-        "🔔 **Current Version**: v1.0\n\n"
-        "To be upfront, there are a few little quirks in this version. For instance, if you send me a message entirely in English, I’ll remind you to use GEEZ letters, "
-        "but if you mix English with Amharic, I might try tagging everything—even the English! Let’s just say, I’ll do my best, but I’m still a work in progress when it comes to mixed languages. 😉 "
-        "you know why did I tell you this? because I don't want you struggle with mixed language datas."
+        "📊 **Amharic Data**:\n"
+        "- Training: 67.9k words\n"
+        "- Validation: 9,436 words\n"
+       "- Test: 9,496 words\n\n"
+        "Total: **86,832 unique words**!\n"
     )
 
-    if len(about_text) > 4000:
-        bot.reply_to(message, "📜 Response is too long! Please try breaking down your question.")
-    else:
-        bot.reply_to(message, about_text, parse_mode="Markdown", disable_web_page_preview=True)
+    bot.reply_to(message, about_text, parse_mode="Markdown", disable_web_page_preview=True)
 
 
 @bot.message_handler(commands=['help'])
 def send_help(message):
-    if not is_user_in_channel(message.from_user.id):
-        bot.reply_to(message, "Please join @Bright_Codes to use this bot.")
-        return
     help_text = (
-        "🆘 Welcome to <b> Hayyuu POS Tagger Bot </b> Help!\n\n"
-        "Here’s a quick guide to help you use my features:\n\n"
-        "1. /start Refresh The Bot\n"
-        "2. /about Learn About Me\n"
-        "3. /info Learn About NLP\n"
-        "4. /help Gethelp page like this 😁\n\n"
-
-
-        "Feel free to ask me anything at @BEK_I and have fun tagging!"
+        "🆘 <b>Hayyuu POS Tagger Bot Help</b>\n\n"
+        "Commands:\n"
+        "1. /start - Restart bot\n"
+        "2. /about - About the bot\n"
+        "3. /info - NLP info\n"
+        "4. /help - Help page\n"
     )
-    if len(help_text) > 4000:
-        bot.reply_to(message, "📜 Response is too long! Try breaking down your question, please.")
-    else:
-        bot.reply_to(message, help_text, parse_mode="html")
+
+    bot.reply_to(message, help_text, parse_mode="html")
+
 
 @bot.message_handler(commands=['teach'])
 def send_teach(message):
-    if not is_user_in_channel(message.from_user.id):
-        bot.reply_to(message, "Please join @Bright_Codes to use this bot.")
-        return
     teach_text = (
         "📚 **Teach Mode** - Coming Soon!\n\n"
-        "Soon, special users will have the opportunity to help me learn by training me on new data! "
-        "This will make me even smarter and better at handling more complex sentences.\n\n"
-
-        "Stay tuned, and follow [@bek_i](https://t.me/bek_i) for updates on when the /teach command will be live!"
+        "Soon, selected users will help add new training data."
     )
-    if len(teach_text) > 4000:
-        bot.reply_to(message, "📜 Response is too long! Try breaking down your question, please.")
-    else:
-        bot.reply_to(message, teach_text, parse_mode="Markdown")
+    bot.reply_to(message, teach_text, parse_mode="Markdown")
+
 
 @bot.message_handler(commands=['info'])
 def handle_info(message):
     bot.reply_to(message, """
-    <b>What is NLP?</b>
-    Natural Language Processing - or NLP in short - is the subfield of AI studying computers' interaction with human language. It allows machines to understand, interpret, and generate human language in useful and meaningful ways. This is what allows us to have AI that speaks with us, reads to us, and even writes like us.
+<b>What is NLP?</b>
+NLP allows computers to understand human language.
 
+<b>POS Tagging</b>
+This bot uses CRF to tag each word based on context.
 
-    <b>Our Vision</b>
-    If it is God's will, soon you will see me, Hayyuu AI, talking to you like GPT, Gemini, and other high-end models. It's our dream to present solutions that enable people to communicate with technology in their mother tongues, thereby reducing gaps in communication and knowledge.
+<b>Vision</b>
+Future versions aim to reach GPT-like abilities in Ethiopian languages.
+""", parse_mode="html")
 
-    <b>POS Tagging: The Very First Step</b>
-    Part of that journey to more advanced models of AI begins with what is called POS, or Part of Speech, tagging. This is a very important part in the development of the AI understanding the structure of sentences—what makes up a sentence: nouns, verbs, adjectives, and so on and so forth. First small yet important step toward building large powerful AI models
-
-    <b>About CRF and Our Tagging Focus</b>
-    The system I use in our POS tagging is called CRF, or Conditional Random Fields—a statistical model which helps predict the most likely sequence of tags for words in a sentence. In tagging, I am mostly concerned with the two previous and two next words since this gives a clearer view about the meaning of the word that is in context and the role it plays in the sentence. Context is everything in a language, and this technique helps me get closer to accuracy for better results.
-
-    <b>General Approach</b>
-    The strategy followed is one of continuous improvement of the system by learning from data and giving more accurate results. As we go further ahead, our AI will learn not just words, but construct responses that are in harmony with the expectations and nuances of human beings.
-
-    <b>Stay Tuned</b>
-    Follow us at @Bright_codes for more information and updates. 🙏
-    Stay tuned for more as we embark on a journey to bring powerful AI to your fingertips.
-    """, parse_mode="html")
 
 @bot.message_handler(func=lambda message: True)
 def handle_all_messages(message):
-    # Check if the user is a member of @Bright_Codes channel
-    user_status = bot.get_chat_member("@Bright_Codes", message.from_user.id).status
-    if user_status == "left":
-        bot.reply_to(message, "🚫 Please join @Bright_Codes to use this feature.")
-        return
-
     sentence = message.text.strip()
+
     if re.search(r'[a-zA-Z]', sentence):
         bot.reply_to(message, "🚫 Please use Amharic (GEEZ) letters for tagging.")
         return
 
     tokens = amharic_tokenizer(sentence)
     if not tokens:
-        bot.reply_to(message, "😕 I couldn't find any Amharic words to tag. Please check your input.")
+        bot.reply_to(message, "😕 I couldn't find any Amharic words. Please check your input.")
         return
 
-    # Prepare features for prediction
     features = sent2features(tokens)
+
     try:
         pos_tags = crf_model.predict([features])[0]
         tagged_sentence = "".join([f"{token}: {tag}\n" for token, tag in zip(tokens, pos_tags)])
 
-        response = tagged_sentence if len(
-            tagged_sentence) < 4000 else "📜 Response is too long! Try a shorter sentence."
+        response = tagged_sentence if len(tagged_sentence) < 4000 else "📜 Response is too long!"
         bot.reply_to(message, response)
-    except Exception as e:
-        bot.send_message(1263404935, f"Error occurred: {str(e)}")
-        bot.reply_to(message, "❗ An error occurred while tagging. Please try again.")
 
-# Run the bot
+    except Exception as e:
+        bot.send_message(1263404935, f"Error: {str(e)}")
+        bot.reply_to(message, "❗ Error occurred while tagging.")
+
+
 def run_bot():
     while True:
         try:
-            print("Bot is running...")
-            bot.infinity_polling()  
+            print("Bot running...")
+            bot.infinity_polling()
         except Exception as e:
-            print(f"Error occurred: {e}")
+            print(f"Error: {e}")
             print("Reconnecting in 10 seconds...")
-            time.sleep(10)  
+            time.sleep(10)
 
-# Run the bot with automatic retries
+
 run_bot()
